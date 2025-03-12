@@ -8,12 +8,43 @@ const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //1. GET a random joke
+app.get("/random", (_req, res) => {
+  const randomId = Math.floor(Math.random() * jokes.length)
+  res.status(200).json(jokes[randomId]);
+})
 
 //2. GET a specific joke
+app.get("/jokes/:id", (req, res) => {
+  const id = parseInt(req.params.id)
+  const joke = jokes.find((joke) => joke.id === id);
+  if (joke) {
+    res.status(200).json(joke);
+  } else {
+    res.status(404).json({ message: "Error - Joke not found." });
+  }
+})
 
 //3. GET a jokes by filtering on the joke type
+app.get("/filter", (req, res) => {
+  const type = req.query.type
+  const jokes = jokes.filter((joke) => joke.jokeType === type);
+  if (jokes) {
+    res.status(200).json(jokes);
+  } else {
+    res.status(404).json({ message: "Error - No jokes with this type found." });
+  }
+})
 
 //4. POST a new joke
+app.post("/jokes", (req, res) => {
+  const joke = req.body;
+  if (!joke.id || !joke.jokeText || !joke.jokeType) {
+    jokes.push(joke);
+    res.status(201).json(joke);
+  } else {
+    res.status(400).json({ message: "Error - Invalid params." });
+  }
+})
 
 //5. PUT a joke
 

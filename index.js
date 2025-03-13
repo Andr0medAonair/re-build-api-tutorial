@@ -98,9 +98,14 @@ app.delete("/jokes/:id", (req, res) => {
 })
 
 //8. DELETE All jokes
-app.delete("/jokes", (_req, res) => {
-  jokes = [];
-  res.status(204);
+app.delete("/jokes/all", (req, res) => {
+  const userKey = req.query.key
+  if (userKey !== masterKey) {
+    res.status(401).json({ message: "Error - You are not authorized to perform this action." });
+  } else {
+    jokes = [];
+    res.status(204);
+  }
 })
 
 app.listen(port, () => {

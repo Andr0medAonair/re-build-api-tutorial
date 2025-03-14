@@ -30,81 +30,84 @@ app.get("/filter", (req, res) => {
 //4. POST a new joke
 app.post("/jokes", (req, res) => {
   const { text, type } = req.body;
-  (!text || !type) ?
-    res.status(400).json({ message: "Error - Invalid params." }) : (() => {
-      const joke = {
-        id: jokes.length + 1,
-        jokeText: text,
-        jokeType: type,
-      }
-      jokes.push(joke);
-      res.status(201).json(joke);
-    })
+  if (!text || !type) {
+    res.status(400).json({ message: "Error - Invalid params." })
+  } else {
+    const joke = {
+      id: jokes.length + 1,
+      jokeText: text,
+      jokeType: type,
+    }
+    jokes.push(joke);
+    res.status(201).json(joke);
+  }
 })
 
 //5. PUT a joke
 app.put("/jokes/:id", (req, res) => {
   const id = parseInt(req.params.id)
   const jokeParams = req.body;
-  (!id || !jokeParams) ?
-    res.status(400).json({ message: "Error - Invalid params." }) : (() => {
-      const index = jokes.findIndex((joke) => joke.id === id);
-      if (!index) {
-        res.status(404).json({ message: "Error - Joke not found." });
-      } else {
-        const newJoke = {
-          id,
-          jokeText: jokeParams.text,
-          jokeType: jokeParams.type,
-        };
-        jokes[index] = newJoke
-        res.status(200).json(newJoke);
-      }
-    })
+  if (!id || !jokeParams) {
+    res.status(400).json({ message: "Error - Invalid params." })
+  } else {
+    const index = jokes.findIndex((joke) => joke.id === id);
+    if (!index) {
+      res.status(404).json({ message: "Error - Joke not found." });
+    } else {
+      const newJoke = {
+        id,
+        jokeText: jokeParams.text,
+        jokeType: jokeParams.type,
+      };
+      jokes[index] = newJoke
+      res.status(200).json(newJoke);
+    }
+  }
 })
 
 //6. PATCH a joke
 app.patch("/jokes/:id", (req, res) => {
   const id = parseInt(req.params.id)
   const jokeParams = req.body;
-  (!id || !jokeParams) ?
-    res.status(400).json({ message: "Error - Invalid params." }) : (() => {
-      const existingJoke = jokes.find((joke) => joke.id === id);
-      const index = jokes.findIndex((joke) => joke.id === id);
-      if (!index) {
-        res.status(404).json({ message: "Error - Joke not found." });
-      } else {
-        const newJoke = {
-          id,
-          jokeText: jokeParams.text ?? existingJoke.jokeText,
-          jokeType: jokeParams.type ?? existingJoke.jokeType,
-        };
-        jokes[index] = newJoke
-        res.status(200).json(newJoke);
-      }
-    })
+  if (!id || !jokeParams) {
+    res.status(400).json({ message: "Error - Invalid params." })
+  } else {
+    const existingJoke = jokes.find((joke) => joke.id === id);
+    const index = jokes.findIndex((joke) => joke.id === id);
+    if (!index) {
+      res.status(404).json({ message: "Error - Joke not found." });
+    } else {
+      const newJoke = {
+        id,
+        jokeText: jokeParams.text ?? existingJoke.jokeText,
+        jokeType: jokeParams.type ?? existingJoke.jokeType,
+      };
+      jokes[index] = newJoke
+      res.status(200).json(newJoke);
+    }
+  }
 })
 
 //7. DELETE Specific joke
 app.delete("/jokes/:id", (req, res) => {
   const id = parseInt(req.params.id)
   const index = jokes.findIndex((joke) => joke.id === id);
-  if (!index) {
+  if (index === -1) {
     res.status(404).json({ message: "Error - Joke not found." });
   } else {
     jokes.splice(index, 1);
-    res.status(204);
+    res.status(204).send();
   }
 })
 
 //8. DELETE All jokes
-app.delete("/jokes/all", (req, res) => {
-  const userKey = req.query.key
-  if (userKey !== masterKey) {
+app.delete("/all", (req, res) => {
+  const userKey = req.query.key ?? ""
+  if (!userKey || userKey !== masterKey) {
     res.status(401).json({ message: "Error - You are not authorized to perform this action." });
   } else {
     jokes = [];
-    res.status(204);
+    res.status(204).send();
   }
 })
 
